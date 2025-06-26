@@ -1,0 +1,23 @@
+{
+  "name": "project-camp-backend",
+  "version": "1.0.0",
+  "description": "a to do list type application",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "mongoose": "^8.16.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.1"
+  }
+}
