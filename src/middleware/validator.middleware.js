@@ -11,6 +11,7 @@ export const validator = (req, res, next) => {
       [e.path]: e.msg,
     }),
   );
+  console.log(extractedError); // <--- Add this line
 
   throw new ApiError(422, "Recieved data is not valid", extractedError);
 };

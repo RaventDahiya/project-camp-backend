@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
 import crypto from "crypto";
+
 const userSchema = new Schema(
   {
     avatar: {
