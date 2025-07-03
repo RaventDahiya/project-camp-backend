@@ -144,14 +144,124 @@ const logoutUser = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, {}, "Logout successful"));
 });
 
-const resendVerificationEmail = asyncHandler(async (req, res) => {});
+const resendVerificationEmail = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(400, "invalid user or password");
+  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new ApiError(400, "wrong password");
+  }
+  if (user.isEmailVerified) {
+    throw new ApiError(400, "user already verified");
+  }
+
+  // Generate new token and expiry
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiry = Date.now() + 60 * 60 * 1000; // 1 hour from now
+  user.emailVerificationToken = token;
+  user.emailVerificationExpiry = expiry;
+  await user.save();
+
+  // Send email
+  await sendMail({
+    email: user.email,
+    subject: "Your verification token",
+    mailGenContent: emailVerificationMailGenContent(
+      user.username,
+      `${process.env.CORS_ORIGIN}/api/v1/users/verify/${token}`,
+    ),
+  });
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        user: {
+          id: user._id,
+          username: user.username,
+          role: user.role,
+        },
+      },
+      "Resent verification email",
+    ),
+  );
+});
 
 const refreshAccessToken = asyncHandler(async (req, res) => {});
 
-const forgotPasswordRequest = asyncHandler(async (req, res) => {});
+const forgotPasswordRequest = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(400, "invalid user");
+  }
+
+  // Generate random token and expiry
+  const token = crypto.randomBytes(32).toString("hex");
+  const expiry = Date.now() + 60 * 60 * 1000; // 1 hour from now
+  user.forgotPasswordToken = token;
+  user.forgotPasswordExpiry = expiry;
+  await user.save();
+
+  await sendMail({
+    email: user.email,
+    subject: "Your password reset link",
+    mailGenContent: forgotPasswordMailGenContent(
+      user.username,
+      `${process.env.CORS_ORIGIN}/api/v1/users/changePassword/${token}`,
+    ),
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password reset link sent to your email"));
+});
+
+const changePassword = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  if (!token) {
+    throw new ApiError(400, "Invalid token");
+  }
+  const user = await User.findOne({ forgotPasswordToken: token });
+
+  if (!user) {
+    throw new ApiError(400, "Invalid or expired token");
+  }
+  if (user.forgotPasswordExpiry < Date.now()) {
+    throw new ApiError(400, "Reset token expired");
+  }
+  if (!newPassword || newPassword.length < 6) {
+    throw new ApiError(400, "Password must be at least 6 characters");
+  }
+
+  user.password = newPassword; // Will be hashed by pre-save hook
+  user.forgotPasswordToken = "";
+  user.forgotPasswordExpiry = null;
+  await user.save();
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully"));
+});
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {});
 
 const getCurrentUser = asyncHandler(async (req, res) => {});
 
-export { registerUser, verifyEmail, loginUser, logoutUser };
+export {
+  registerUser,
+  verifyEmail,
+  loginUser,
+  logoutUser,
+  resendVerificationEmail,
+  refreshAccessToken,
+  forgotPasswordRequest,
+  changeCurrentPassword,
+  getCurrentUser,
+  changePassword,
+};

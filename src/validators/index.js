@@ -37,4 +37,15 @@ const userLoginValidator = () => {
     body("password").notEmpty().withMessage("password cannot be empty"),
   ];
 };
-export { userRegistrationValidator, userLoginValidator };
+
+const userPasswordValidator = () => {
+  return [
+    body("newPassword")
+      .notEmpty()
+      .withMessage("newPassword is required")
+      .isLength({ min: 6 })
+      .withMessage("newPassword should be at least 6 characters"),
+  ];
+};
+
+export { userRegistrationValidator, userLoginValidator, userPasswordValidator };

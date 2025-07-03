@@ -61,17 +61,17 @@ const forgotPasswordMailGenContent = (username, passwordResetUrl) => {
     body: {
       name: username,
       intro: "we got a request to reset your password.",
-    },
-    action: {
-      instructions: "To change your password, please click here:",
-      button: {
-        color: "#22BC66", // Optional action button color
-        text: "Reset Password",
-        link: passwordResetUrl,
+      action: {
+        instructions: "To change your password, please click here:",
+        button: {
+          color: "#22BC66", // Optional action button color
+          text: "Reset Password",
+          link: passwordResetUrl,
+        },
       },
+      outro:
+        "Need help, or have questions? Just reply to this email, we'd love to help.",
     },
-    outro:
-      "Need help, or have questions? Just reply to this email, we'd love to help.",
   };
 };
 
