@@ -17,6 +17,7 @@ import {
   userRegistrationValidator,
   userLoginValidator,
   userPasswordValidator,
+  changePasswordValidator,
 } from "../validators/index.js";
 
 const router = Router();
@@ -31,7 +32,15 @@ router
   .post(userLoginValidator(), validator, resendVerificationEmail);
 router.route("/forgotPassword").post(validator, forgotPasswordRequest);
 router
-  .route("/changePassword/:token")
+  .route("/changePassword")
   .post(userPasswordValidator(), validator, changePassword);
+router
+  .route("/changeCurrentPassword")
+  .post(
+    changePasswordValidator(),
+    validator,
+    isLoggedIn,
+    changeCurrentPassword,
+  );
 
 export default router;

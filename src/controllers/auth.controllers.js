@@ -190,7 +190,51 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
   );
 });
 
-const refreshAccessToken = asyncHandler(async (req, res) => {});
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
+  if (!refreshToken) {
+    throw new ApiError(401, "Refresh token missing");
+  }
+
+  // Find user with this refresh token
+  const user = await User.findOne({ refreshToken });
+  if (!user) {
+    throw new ApiError(401, "Invalid refresh token");
+  }
+
+  // Verify refresh token
+  let decoded;
+  try {
+    decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+  } catch (err) {
+    throw new ApiError(401, "Refresh token expired or invalid");
+  }
+
+  // Issue new access token
+  const newAccessToken = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "24h" },
+  );
+
+  // Optionally, issue a new refresh token (token rotation)
+  // const newRefreshToken = user.generateRefreshToken();
+  // user.refreshToken = newRefreshToken;
+  // await user.save();
+  // res.cookie("refreshToken", newRefreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", maxAge: 7 * 24 * 60 * 60 * 1000 });
+
+  res.cookie("token", newAccessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, { token: newAccessToken }, "Access token refreshed"),
+    );
+});
 
 const forgotPasswordRequest = asyncHandler(async (req, res) => {
   const { email } = req.body;
@@ -249,7 +293,23 @@ const changePassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
-const changeCurrentPassword = asyncHandler(async (req, res) => {});
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const { email, password, newPassword } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(400, "invalid user");
+  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new ApiError(400, "wrong password");
+  }
+  if (!user.isEmailVerified) {
+    throw new ApiError(400, "user not verified please verify user first");
+  }
+  user.password = newPassword;
+  await user.save();
+  res.status(200).json(new ApiResponse(200, { email }, "Password changed"));
+});
 
 const getCurrentUser = asyncHandler(async (req, res) => {});
 
