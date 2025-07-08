@@ -1,13 +1,23 @@
 import { Router } from "express";
-import { UserRolesEnum } from "../utils/constants.js";
+import { UserRolesEnum, AvailableUserRoles } from "../utils/constants.js";
 import { validateProjectPermission } from "../middleware/auth.middleware.js";
+import {
+  getNotes,
+  getNoteById,
+  createNote,
+  updateNote,
+  deleteNotes,
+} from "../controllers/note.controllers.js";
+
 const router = Router();
 
 router
   .route("/:projectId")
-  .get(
-    validateProjectPermission([UserRolesEnum.ADMIN, UserRolesEnum.MEMBER]),
-    getNotes,
-  )
+  .get(validateProjectPermission(AvailableUserRoles), getNotes)
   .post(validateProjectPermission([UserRolesEnum.ADMIN]), createNote);
+router
+  .route("/:projectId/n/:noteId")
+  .get(validateProjectPermission(AvailableUserRoles), getNoteById)
+  .put(validateProjectPermission([UserRolesEnum.ADMIN]), updateNote)
+  .delete(validateProjectPermission([UserRolesEnum.ADMIN]), deleteNotes);
 export default router;
