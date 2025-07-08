@@ -311,7 +311,16 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { email }, "Password changed"));
 });
 
-const getCurrentUser = asyncHandler(async (req, res) => {});
+const getCurrentUser = asyncHandler(async (req, res) => {
+  // req.user should be set by isLoggedIn middleware
+  const user = await User.findById(req.user.id).select(
+    "_id email username fullname role isEmailVerified",
+  );
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  res.status(200).json(new ApiResponse(200, { user }, "Current user fetched"));
+});
 
 export {
   registerUser,

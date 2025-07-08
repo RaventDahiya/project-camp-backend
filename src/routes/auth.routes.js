@@ -42,5 +42,7 @@ router
     isLoggedIn,
     changeCurrentPassword,
   );
+router.route("/refreshAccessToken").post(refreshAccessToken);
+router.route("/getCurrentUser").get(isLoggedIn, getCurrentUser);
 
 export default router;
