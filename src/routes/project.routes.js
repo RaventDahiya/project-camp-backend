@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { isLoggedIn } from "../middleware/auth.middleware.js";
+import {
+  isLoggedIn,
+  validateProjectPermission,
+} from "../middleware/auth.middleware.js";
+import { AvailableUserRoles, UserRolesEnum } from "../utils/constants.js";
 import {
   getProjects,
   getProjectById,
@@ -21,22 +25,48 @@ router.route("/").get(isLoggedIn, getProjects).post(isLoggedIn, createProject);
 // Single project routes
 router
   .route("/:projectId")
-  .get(isLoggedIn, getProjectById)
-  .put(isLoggedIn, updateProject)
-  .delete(isLoggedIn, deleteProject);
+  .get(isLoggedIn, validateProjectPermission([]), getProjectById) // Added permission check
+  .put(
+    isLoggedIn,
+    validateProjectPermission([UserRolesEnum.ADMIN]),
+    updateProject,
+  )
+  .delete(
+    isLoggedIn,
+    validateProjectPermission([UserRolesEnum.ADMIN]),
+    deleteProject,
+  );
 
 // Project members collection routes
 router
   .route("/:projectId/members")
-  .post(isLoggedIn, addMembersToProject)
-  .get(isLoggedIn, getProjectMembers)
-  .put(isLoggedIn, updateProjectMembers);
+  .post(
+    isLoggedIn,
+    validateProjectPermission([UserRolesEnum.ADMIN]),
+    addMembersToProject,
+  )
+  .get(isLoggedIn, validateProjectPermission([]), getProjectMembers);
+// .put(
+//   isLoggedIn,
+//   validateProjectPermission([UserRolesEnum.ADMIN]),
+//   updateProjectMembers,
+// );
 
 // Single project member routes
 router
   .route("/:projectId/members/:memberId/role")
-  .put(isLoggedIn, updateMemberRole);
+  .put(
+    isLoggedIn,
+    validateProjectPermission([UserRolesEnum.ADMIN]),
+    updateMemberRole,
+  );
 
-router.route("/:projectId/members/:memberId").delete(isLoggedIn, deleteMember);
+router
+  .route("/:projectId/members/:memberId")
+  .delete(
+    isLoggedIn,
+    validateProjectPermission([UserRolesEnum.ADMIN]),
+    deleteMember,
+  );
 
 export default router;

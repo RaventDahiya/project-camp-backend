@@ -5,7 +5,9 @@ import { ProjectNote } from "../models/note.models.js";
 import { Project } from "../models/project.models.js";
 import mongoose from "mongoose";
 import { User } from "../models/user.models.js";
-import { UserRolesEnum } from "../utils/constants.js";
+import { AvailableUserRoles, UserRolesEnum } from "../utils/constants.js";
+import { Task } from "../models/task.models.js";
+import { SubTask } from "../models/subtask.models.js";
 import { ProjectMember } from "../models/projectmember.models.js";
 
 const getProjects = asyncHandler(async (req, res) => {
@@ -38,21 +40,9 @@ const getProjects = asyncHandler(async (req, res) => {
 const getProjectById = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
 
-  // **Crucial Security Check**
-  // Before fetching the project, verify the current user is a member.
-  // We use findOne because we only need to confirm that a link exists.
-  const membership = await ProjectMember.findOne({
-    project: projectId,
-    user: req.user._id,
-  });
+  // The `validateProjectPermission` middleware has already confirmed the user is a member.
+  // We can safely proceed to fetch the project details.
 
-  // If no membership is found, the user does not have access.
-  // We use 404 to avoid revealing the project's existence to an unauthorized user.
-  if (!membership) {
-    throw new ApiError(404, "Project not found or you do not have access");
-  }
-
-  // If the check passes, fetch the full project details using the projectId from the URL.
   const projectDetails = await Project.findById(projectId).populate(
     "createdBy",
     "username fullname",
@@ -106,20 +96,9 @@ const updateProject = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Please provide a name or description to update.");
   }
 
-  // 2. Permission Check: Verify the user is an admin of this project
-  const membership = await ProjectMember.findOne({
-    user: req.user._id,
-    project: projectId,
-  });
+  // The `validateProjectPermission` middleware has already confirmed the user is an ADMIN.
 
-  if (!membership || membership.role !== UserRolesEnum.ADMIN) {
-    throw new ApiError(
-      403,
-      "You do not have permission to update this project.",
-    );
-  }
-
-  // 3. Unique Name Check (only if the name is being updated)
+  // 2. Unique Name Check (only if the name is being updated)
   if (name) {
     // Find a project with the same name but a DIFFERENT ID.
     const existingProject = await Project.findOne({
@@ -132,7 +111,7 @@ const updateProject = asyncHandler(async (req, res) => {
     }
   }
 
-  // 4. Perform the update
+  // 3. Perform the update
   const updatedProject = await Project.findByIdAndUpdate(
     projectId,
     { $set: { name, description } }, // Use $set to update only provided fields
@@ -143,18 +122,283 @@ const updateProject = asyncHandler(async (req, res) => {
     throw new ApiError(404, "project not found");
   }
 
-  // 5. Send the success response
+  // 4. Send the success response
   return res
     .status(200)
     .json(new ApiResponse(200, updatedProject, "Project updated successfully"));
 });
 
-const deleteProject = asyncHandler(async (req, res) => {});
-const addMembersToProject = asyncHandler(async (req, res) => {});
-const getProjectMembers = asyncHandler(async (req, res) => {});
+const deleteProject = asyncHandler(async (req, res) => {
+  const { projectId } = req.params;
+
+  // The `validateProjectPermission` middleware has already confirmed the user is an ADMIN.
+  // A transaction ensures that if any of the delete operations fail,
+  // all previous operations will be rolled back. This prevents orphaned data.
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // To ensure data integrity, we must delete all documents that reference the project.
+    // This is known as a cascading delete.
+
+    // 2. Find all tasks in the project to delete their subtasks
+    const tasks = await Task.find({ project: projectId })
+      .select("_id")
+      .session(session);
+    const taskIds = tasks.map((task) => task._id);
+
+    // 3. Delete all subtasks associated with the tasks of the project
+    if (taskIds.length > 0) {
+      await SubTask.deleteMany({ task: { $in: taskIds } }, { session });
+    }
+
+    // 4. Delete all tasks in the project
+    await Task.deleteMany({ project: projectId }, { session });
+
+    // 5. Delete all associated project notes
+    await ProjectNote.deleteMany({ project: projectId }, { session });
+
+    // 6. Delete all associated project members
+    await ProjectMember.deleteMany({ project: projectId }, { session });
+
+    // 7. Finally, delete the project itself
+    const deletedProject = await Project.findByIdAndDelete(projectId, {
+      session,
+    });
+
+    if (!deletedProject) {
+      throw new ApiError(404, "Project not found");
+    }
+
+    // If all operations were successful, commit the transaction
+    await session.commitTransaction();
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { _id: projectId },
+          "Project and associated data deleted successfully",
+        ),
+      );
+  } catch (error) {
+    // If any error occurs during the transaction, abort it
+    await session.abortTransaction();
+    // Re-throw the error to be handled by the asyncHandler
+    throw error;
+  } finally {
+    // Always end the session
+    session.endSession();
+  }
+});
+
+const addMembersToProject = asyncHandler(async (req, res) => {
+  // The `validateProjectPermission` middleware has already confirmed the requesting user is an ADMIN.
+
+  // 1. Get Inputs
+  const { projectId } = req.params;
+  const { email, role } = req.body;
+
+  // 2. Validate Inputs
+  if (!email) {
+    throw new ApiError(400, "User email is required to add a member.");
+  }
+
+  // Optional: Validate the role if it's provided
+  if (role && !AvailableUserRoles.includes(role)) {
+    throw new ApiError(400, "Invalid role specified.");
+  }
+
+  // 3. Find the user to add
+  const userToAdd = await User.findOne({ email });
+
+  if (!userToAdd) {
+    throw new ApiError(404, "User with the specified email does not exist.");
+  }
+
+  // New check: Ensure the user's email is verified
+  if (!userToAdd.isEmailVerified) {
+    throw new ApiError(
+      400,
+      "Cannot add an unverified user. The user must verify their email first.",
+    );
+  }
+
+  // 4. Check if the user is already a member of the project
+  const existingMembership = await ProjectMember.findOne({
+    project: projectId,
+    user: userToAdd._id,
+  });
+
+  if (existingMembership) {
+    throw new ApiError(409, "User is already a member of this project.");
+  }
+
+  // 5. Create the new membership
+  const newMember = await ProjectMember.create({
+    project: projectId,
+    user: userToAdd._id,
+    role: role || UserRolesEnum.MEMBER, // Default to MEMBER if no role is provided
+  });
+
+  // 6. Send success response
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        newMember,
+        "User added to the project successfully.",
+      ),
+    );
+});
+
+const getProjectMembers = asyncHandler(async (req, res) => {
+  // The `validateProjectPermission` middleware has already confirmed the user is a member.
+  const { projectId } = req.params;
+
+  // Find all membership documents for the given project.
+  // Use .populate() to efficiently fetch the details of each user.
+  // We select specific fields from the user to avoid exposing sensitive data.
+  const members = await ProjectMember.find({
+    project: projectId,
+  }).populate("user", "username fullname email avatar");
+
+  // .find() returns an empty array if no documents are found, which is the correct response.
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, members, "Project members fetched successfully."),
+    );
+});
+
+/**
+ * @description This controller is for bulk updating project members.
+ * It allows replacing the entire member list in one go.
+ * This is a complex operation and is currently not needed for the application's core functionality.
+ * It is kept here for potential future use if a more advanced member management UI is built.
+ */
 const updateProjectMembers = asyncHandler(async (req, res) => {});
-const updateMemberRole = asyncHandler(async (req, res) => {});
-const deleteMember = asyncHandler(async (req, res) => {});
+
+const updateMemberRole = asyncHandler(async (req, res) => {
+  // The `validateProjectPermission` middleware has already confirmed the requesting user is an ADMIN.
+
+  // 1. Get Inputs
+  const { projectId, memberId } = req.params;
+  const { role } = req.body;
+
+  // 2. Validate role input
+  if (!role || !AvailableUserRoles.includes(role)) {
+    throw new ApiError(400, "Invalid role specified.");
+  }
+
+  // 3. Find the membership document to update using the memberId from the URL
+  const membershipToUpdate = await ProjectMember.findById(memberId);
+
+  // Also, ensure the found member belongs to the correct project
+  if (
+    !membershipToUpdate ||
+    membershipToUpdate.project.toString() !== projectId
+  ) {
+    throw new ApiError(404, "Member not found in this project.");
+  }
+
+  // 4. Prevent the last admin from being demoted or removed
+  if (
+    membershipToUpdate.role === UserRolesEnum.ADMIN &&
+    role !== UserRolesEnum.ADMIN
+  ) {
+    const adminCount = await ProjectMember.countDocuments({
+      project: projectId,
+      role: UserRolesEnum.ADMIN,
+    });
+
+    if (adminCount <= 1) {
+      throw new ApiError(400, "Cannot remove the last admin from the project.");
+    }
+  }
+
+  // 5. Update and save the role
+  membershipToUpdate.role = role;
+  await membershipToUpdate.save();
+
+  // 6. Send success response
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        membershipToUpdate,
+        "Member role updated successfully.",
+      ),
+    );
+});
+
+const deleteMember = asyncHandler(async (req, res) => {
+  // The `validateProjectPermission` middleware has already confirmed the user is an ADMIN.
+
+  const { projectId, memberId } = req.params;
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // 2. Find the membership document to delete
+    const membershipToDelete =
+      await ProjectMember.findById(memberId).session(session);
+
+    // 3. Validate the membership exists and belongs to the correct project
+    if (
+      !membershipToDelete ||
+      membershipToDelete.project.toString() !== projectId
+    ) {
+      throw new ApiError(404, "Member not found in this project.");
+    }
+
+    // 4. Prevent the last admin from being removed
+    if (membershipToDelete.role === UserRolesEnum.ADMIN) {
+      const adminCount = await ProjectMember.countDocuments(
+        {
+          project: projectId,
+          role: UserRolesEnum.ADMIN,
+        },
+        { session },
+      );
+
+      if (adminCount <= 1) {
+        throw new ApiError(
+          400,
+          "Cannot remove the last admin from the project. Please assign a new admin first.",
+        );
+      }
+    }
+
+    // 5. Handle Data Integrity: Un-assign tasks from the user being removed.
+    await Task.updateMany(
+      { project: projectId, assignedTo: membershipToDelete.user },
+      { $set: { assignedTo: null } },
+      { session },
+    );
+
+    // 6. Delete the membership
+    await ProjectMember.findByIdAndDelete(memberId, { session });
+
+    await session.commitTransaction();
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, {}, "Member removed from project successfully."),
+      );
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+});
 
 export {
   getProjects,

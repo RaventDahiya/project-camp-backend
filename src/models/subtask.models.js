@@ -5,12 +5,12 @@ const subtaskSchema = new Schema(
     title: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     task: {
       type: Schema.Types.ObjectId,
       ref: "Task",
-      require: true,
+      required: true,
     },
     isCompleted: {
       type: Boolean,
@@ -19,7 +19,7 @@ const subtaskSchema = new Schema(
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     },
   },
   { timestamps: true },

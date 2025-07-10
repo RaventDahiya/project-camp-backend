@@ -4,6 +4,7 @@ import { ProjectMember } from "../models/projectmember.models.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import mongoose from "mongoose";
+
 export const isLoggedIn = asyncHandler(async (req, res, next) => {
   let token =
     req.cookies?.token || req.header("Authorization")?.replace("Bearer ", "");
@@ -27,27 +28,38 @@ export const isLoggedIn = asyncHandler(async (req, res, next) => {
   next();
 });
 
-export const validateProjectPermission = (roles = []) =>
+export const validateProjectPermission = (requiredRoles = []) =>
   asyncHandler(async (req, res, next) => {
     const { projectId } = req.params;
-    if (!projectId) {
-      throw new ApiError(401, "Invalid Project id");
+
+    // 1. Check if projectId is a valid ObjectId format
+    if (!mongoose.isValidObjectId(projectId)) {
+      throw new ApiError(400, "Invalid project ID format.");
     }
-    const project = await ProjectMember.findOne({
-      project: mongoose.Types.ObjectId(projectId),
-      user: mongoose.Types.ObjectId(req.user._id),
+
+    // 2. Find the user's membership for this project
+    const membership = await ProjectMember.findOne({
+      project: projectId,
+      user: req.user._id,
     });
-    if (!project) {
-      throw new ApiError(401, "project not find");
+
+    // 3. If no membership, user has no access. Use 404 to not reveal project existence.
+    if (!membership) {
+      throw new ApiError(404, "Project not found or you do not have access.");
     }
 
-    const givenRole = project?.role;
-    req.user.role = givenRole; // Attach project-specific role to req.user for downstream use
-
-    if (!roles.includes(givenRole)) {
+    // 4. Check if the user's role meets the requirements
+    // If requiredRoles is empty, just being a member is enough.
+    if (requiredRoles.length > 0 && !requiredRoles.includes(membership.role)) {
       throw new ApiError(
         403,
-        "you dont have permission to perform this action",
+        "You do not have permission to perform this action.",
       );
     }
+
+    // Attach the membership to the request object for use in subsequent controllers
+    req.projectMembership = membership;
+
+    // 5. If all checks pass, proceed to the next middleware/controller
+    next();
   });
