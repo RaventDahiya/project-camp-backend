@@ -1,0 +1,1123 @@
+{
+	"info": {
+		"_postman_id": "341be720-8300-4756-a82e-9dbc9de121de",
+		"name": "project camp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44650467",
+		"_collection_link": "https://ravent-3541858.postman.co/workspace/ravent's-Workspace~de0d8adf-15fe-4874-87ea-72e8cc1747a7/collection/44650467-341be720-8300-4756-a82e-9dbc9de121de?action=share&source=collection_link&creator=44650467"
+	},
+	"item": [
+		{
+			"name": "healthcheck",
+			"item": [
+				{
+					"name": "healthcheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/api/v1/healthcheck",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"healthcheck"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"ishapandey@example.com\",\r\n  \"username\": \"ishapandey\",\r\n  \"fullname\": \"isha pandey\",\r\n  \"password\": \"123504643\",\r\n  \"role\": \"member\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/users/register",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"amitt@example.com\",\r\n  \"password\": \"onkfasnnk\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/users/login",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"amitt@example.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/users/forgotPassword",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"forgotPassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resend Verification Email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"rani@example.com\",\r\n  \"password\": \"123456789@\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/users/resendVerificationEmail",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"resendVerificationEmail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"amitt@example.com\",\r\n  \"password\": \"amitt456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/users/logout",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refreshAccessToken",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"amitt@example.com\",\r\n  \"password\": \"amitt456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/users/refreshAccessToken",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"refreshAccessToken"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change Current Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"amitt@example.com\",\r\n  \"password\": \"9911208689\",\r\n  \"newPassword\":\"onkfasnnk\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/users/changeCurrentPassword",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"changeCurrentPassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCurrentUser",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"amitt@example.com\",\r\n  \"password\": \"9911208689\",\r\n  \"newPassword\":\"onkfasnnk\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/users/getCurrentUser",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"getCurrentUser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "mailVeriy",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "change password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"newPassword\":\"9911208689\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/users/changePassword/55d0db56286681b486103123feb7c97e5397e21d02c1d2e95eb804370781b369",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"changePassword",
+								"55d0db56286681b486103123feb7c97e5397e21d02c1d2e95eb804370781b369"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "project",
+			"item": [
+				{
+					"name": "createProject",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"project 2\",\r\n  \"description\": \"This is a second test project created via Postman.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProjects",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"My Awesome Project\",\r\n  \"description\": \"This is a test project created via Postman.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProjectById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"My Awesome Project\",\r\n  \"description\": \"This is a test project created via Postman.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects/686d01b024e9741adcde63cf",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"686d01b024e9741adcde63cf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateProject",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"project (UPDATED)\",\r\n  \"description\": \"This is a updated test project created via Postman.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects/686d01b024e9741adcde63cf",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"686d01b024e9741adcde63cf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteProject",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects/686d01b024e9741adcde63cf",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"686d01b024e9741adcde63cf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addMembersToProject",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"tanya@example.com\",\r\n    \"role\":\"member\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects/686f55fd0bb9e277d496e905/members",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"686f55fd0bb9e277d496e905",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProjectMembers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects/686f55fd0bb9e277d496e905/members",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"686f55fd0bb9e277d496e905",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateMemberRole",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"raniii@example.com\",\r\n    \"role\":\"member\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects/686f55fd0bb9e277d496e905/members/686f9311ff56fa96c0a909cd/role",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"686f55fd0bb9e277d496e905",
+								"members",
+								"686f9311ff56fa96c0a909cd",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteMember",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/projects/686f55fd0bb9e277d496e905/members/686f9311ff56fa96c0a909cd",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"686f55fd0bb9e277d496e905",
+								"members",
+								"686f9311ff56fa96c0a909cd"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "notes",
+			"item": [
+				{
+					"name": "createNote",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\":\"this is a 3rd note content\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/notes/686f55fd0bb9e277d496e905",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notes",
+								"686f55fd0bb9e277d496e905"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getNotes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/api/v1/notes/686f55fd0bb9e277d496e905",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notes",
+								"686f55fd0bb9e277d496e905"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getNoteById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\":\"this is a 3rd note content\"\r\n}"
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/notes/686f55fd0bb9e277d496e905/n/68738a008b7843bdecf5130e",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notes",
+								"686f55fd0bb9e277d496e905",
+								"n",
+								"68738a008b7843bdecf5130e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateNote",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\":\"this is a 1st updated note content\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/notes/686f55fd0bb9e277d496e905/n/68738a008b7843bdecf5130e",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notes",
+								"686f55fd0bb9e277d496e905",
+								"n",
+								"68738a008b7843bdecf5130e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteNotes",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\":\"this is a 1st updated note content\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/notes/686f55fd0bb9e277d496e905/n/68738ab98b7843bdecf5131c",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"notes",
+								"686f55fd0bb9e277d496e905",
+								"n",
+								"68738ab98b7843bdecf5131c"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "createTask",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"demo task\",\r\n    \"description\": \"its a demo task.\",\r\n    \"assignedTo\": \"686cf207a39e708d994017c8\",\r\n    \"status\": \"todo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/tasks/686f55fd0bb9e277d496e905",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tasks",
+								"686f55fd0bb9e277d496e905"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTasksInProject",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Design new user dashboard\",\r\n    \"description\": \"Create a detailed wireframe and mockup for the main user dashboard. Include all key metrics and navigation elements.\",\r\n    \"assignedTo\": \"686cf207a39e708d994017c8\",\r\n    \"status\": \"todo\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/tasks/686f55fd0bb9e277d496e905",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tasks",
+								"686f55fd0bb9e277d496e905"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTaskById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/tasks/686f55fd0bb9e277d496e905/687396c4be18598bd4108b47",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tasks",
+								"686f55fd0bb9e277d496e905",
+								"687396c4be18598bd4108b47"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteTask",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/tasks/686f55fd0bb9e277d496e905/687396c4be18598bd4108b47",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tasks",
+								"686f55fd0bb9e277d496e905",
+								"687396c4be18598bd4108b47"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateTask",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"1st demo task\",\r\n    \"description\": \"hello world\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/tasks/686f55fd0bb9e277d496e905/687396c4be18598bd4108b47",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tasks",
+								"686f55fd0bb9e277d496e905",
+								"687396c4be18598bd4108b47"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateTaskStatus",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"in_process\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/tasks/686f55fd0bb9e277d496e905/687397b6aea8b7c9eaa49dee/status",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tasks",
+								"686f55fd0bb9e277d496e905",
+								"687397b6aea8b7c9eaa49dee",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "assignTask",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assignedTo\": \"6864bfba847b6d55f992a064\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/tasks/686f55fd0bb9e277d496e905/687397b6aea8b7c9eaa49dee/assign",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tasks",
+								"686f55fd0bb9e277d496e905",
+								"687397b6aea8b7c9eaa49dee",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "sub_task",
+			"item": [
+				{
+					"name": "createSubTask",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\":\"test sub_task\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/subtasks/686f55fd0bb9e277d496e905/687397b6aea8b7c9eaa49dee",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subtasks",
+								"686f55fd0bb9e277d496e905",
+								"687397b6aea8b7c9eaa49dee"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSubTasksForTask",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/subtasks/686f55fd0bb9e277d496e905/687397b6aea8b7c9eaa49dee",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subtasks",
+								"686f55fd0bb9e277d496e905",
+								"687397b6aea8b7c9eaa49dee"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateSubTask",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\":\"updated sub_task\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/subtasks/686f55fd0bb9e277d496e905/687397b6aea8b7c9eaa49dee/6873aaa09d79fa55f9df8bc6",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subtasks",
+								"686f55fd0bb9e277d496e905",
+								"687397b6aea8b7c9eaa49dee",
+								"6873aaa09d79fa55f9df8bc6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteSubTask",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\":\"updated sub_task\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/subtasks/686f55fd0bb9e277d496e905/687397b6aea8b7c9eaa49dee/6873aaa09d79fa55f9df8bc6",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subtasks",
+								"686f55fd0bb9e277d496e905",
+								"687397b6aea8b7c9eaa49dee",
+								"6873aaa09d79fa55f9df8bc6"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "toggleSubTaskStatus",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\":\"updated sub_task\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/api/v1/subtasks/686f55fd0bb9e277d496e905/687397b6aea8b7c9eaa49dee/6873ab5c9d79fa55f9df8bd9/toggle-status",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subtasks",
+								"686f55fd0bb9e277d496e905",
+								"687397b6aea8b7c9eaa49dee",
+								"6873ab5c9d79fa55f9df8bd9",
+								"toggle-status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

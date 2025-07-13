@@ -106,6 +106,12 @@ The API is structured around REST principles. Here are some of the main endpoint
 - `DELETE /api/v1/tasks/:projectId/:taskId` - Delete a task and its subtasks
 - `POST /api/v1/subtasks/:projectId/:taskId` - Create a new subtask for a task
 
+## 🧪 API Testing with Postman
+
+A comprehensive Postman collection is available to test all the API endpoints. It includes pre-configured requests for all operations, making it easy to interact with the API.
+
+[!Run in Postman](https://ravent-3541858.postman.co/workspace/ravent's-Workspace~de0d8adf-15fe-4874-87ea-72e8cc1747a7/collection/44650467-341be720-8300-4756-a82e-9dbc9de121de?action=share&source=collection_link&creator=44650467)
+
 ## 📄 License
 
 This project is licensed under the ISC License.
