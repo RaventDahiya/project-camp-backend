@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { isLoggedIn } from "../middleware/auth.middleware.js";
 import {
+  updateUserAvatar,
   registerUser,
   verifyEmail,
   logoutUser,
@@ -12,6 +13,7 @@ import {
   getCurrentUser,
   changePassword,
 } from "../controllers/auth.controllers.js";
+import { upload } from "../middleware/multer.middleware.js";
 import { validator } from "../middleware/validator.middleware.js";
 import {
   userRegistrationValidator,
@@ -44,5 +46,8 @@ router
   );
 router.route("/refreshAccessToken").post(refreshAccessToken);
 router.route("/getCurrentUser").get(isLoggedIn, getCurrentUser);
+router
+  .route("/update-avatar")
+  .patch(isLoggedIn, upload.single("avatar"), updateUserAvatar);
 
 export default router;

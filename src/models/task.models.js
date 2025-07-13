@@ -6,7 +6,7 @@ const taskSchema = new Schema(
     title: {
       type: String,
       trim: true,
-      require: true,
+      required: true,
     },
     description: {
       type: String,
@@ -14,17 +14,17 @@ const taskSchema = new Schema(
     project: {
       type: Schema.Types.ObjectId,
       ref: "Project",
-      require: [true, "projrct ref is required"],
+      required: [true, "project ref is required"],
     },
     assignedTo: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     },
     assignedBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     },
     status: {
       type: String,
@@ -35,6 +35,7 @@ const taskSchema = new Schema(
       type: [
         {
           url: String,
+          public_id: String,
           mimetype: String,
           size: Number,
         },

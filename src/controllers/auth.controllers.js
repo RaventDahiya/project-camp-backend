@@ -10,6 +10,7 @@ import {
 } from "../utils/mail.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   const { email, username, password, role, fullname } = req.body;
@@ -92,12 +93,8 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "wrong password");
   }
 
-  // Generate access token
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "24h" },
-  );
+  // Use the model's method for consistency and encapsulation
+  const token = user.generateAccessToken();
 
   // Generate refresh token
   const refreshToken = user.generateRefreshToken();
@@ -322,6 +319,48 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { user }, "Current user fetched"));
 });
 
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
+
+  // Upload the new avatar to Cloudinary
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar?.url) {
+    throw new ApiError(500, "Error while uploading avatar");
+  }
+
+  // Get the current user to find the old avatar's public_id
+  const user = await User.findById(req.user._id);
+  const oldAvatarPublicId = user.avatar?.public_id;
+
+  // Update the user's avatar in the database
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar: {
+          url: avatar.url,
+          public_id: avatar.public_id,
+        },
+      },
+    },
+    { new: true },
+  ).select("-password -refreshToken");
+
+  // If there was an old avatar (and it's not the default), delete it from Cloudinary
+  if (oldAvatarPublicId && oldAvatarPublicId !== "default_avatar") {
+    await deleteOnCloudinary(oldAvatarPublicId);
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "Avatar updated successfully"));
+});
+
 export {
   registerUser,
   verifyEmail,
@@ -333,4 +372,5 @@ export {
   changeCurrentPassword,
   getCurrentUser,
   changePassword,
+  updateUserAvatar,
 };

@@ -9,11 +9,11 @@ const userSchema = new Schema(
     avatar: {
       type: {
         url: String,
-        localpath: String,
+        public_id: String,
       },
       default: {
         url: `https://placehold.co/600x400`,
-        localpath: "",
+        public_id: "default_avatar",
       },
     },
     username: {
@@ -94,7 +94,7 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
-userSchema.methods.generatTemporaryToken = function () {
+userSchema.methods.generateTemporaryToken = function () {
   const unHashedToken = crypto.randomBytes(20).toString("hex");
   const hashedToken = crypto
     .createHash("sha256")

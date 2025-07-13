@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { UserRolesEnum, AvailableUserRoles } from "../utils/constants.js";
-import { validateProjectPermission } from "../middleware/auth.middleware.js";
+import {
+  isLoggedIn,
+  validateProjectPermission,
+} from "../middleware/auth.middleware.js";
 import {
   getNotes,
   getNoteById,
@@ -11,6 +14,9 @@ import {
 
 const router = Router();
 
+// Apply isLoggedIn middleware to all routes in this file.
+// This ensures that the user is authenticated before any note-related action.
+router.use(isLoggedIn);
 router
   .route("/:projectId")
   .get(validateProjectPermission(AvailableUserRoles), getNotes)

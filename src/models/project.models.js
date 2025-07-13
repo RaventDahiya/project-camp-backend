@@ -4,7 +4,7 @@ const projectSchema = new Schema(
   {
     name: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
       trim: true,
     },
@@ -14,7 +14,7 @@ const projectSchema = new Schema(
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
-      require: true,
+      required: true,
     },
   },
   { timestamps: true },

@@ -6,13 +6,10 @@ import { Project } from "../models/project.models.js";
 import mongoose from "mongoose";
 
 const getNotes = asyncHandler(async (req, res) => {
+  // The `validateProjectPermission` middleware has already confirmed the user has access to this project.
   const { projectId } = req.params;
-  const project = await Project.findById(projectId);
-  if (!project) {
-    throw new ApiError(404, "project not found");
-  }
   const notes = await ProjectNote.find({
-    project: mongoose.Types.ObjectId(projectId),
+    project: projectId,
   }).populate("createdBy", "username fullname avatar");
   // No need to check for !notes, as find returns an array
   return res
@@ -21,13 +18,16 @@ const getNotes = asyncHandler(async (req, res) => {
 });
 
 const getNoteById = asyncHandler(async (req, res) => {
-  const { noteId } = req.params;
-  const note = await ProjectNote.findById(noteId).populate(
-    "createdBy",
-    "username fullname avatar",
-  );
+  const { projectId, noteId } = req.params;
+  // Find the note but ensure it belongs to the project specified in the URL
+  const note = await ProjectNote.findOne({
+    _id: noteId,
+    project: projectId,
+  }).populate("createdBy", "username fullname avatar");
+
   if (!note) {
-    throw new ApiError(404, "note not found");
+    // Use a more specific error message
+    throw new ApiError(404, "Note not found in this project");
   }
   return res
     .status(200)
@@ -35,16 +35,13 @@ const getNoteById = asyncHandler(async (req, res) => {
 });
 
 const createNote = asyncHandler(async (req, res) => {
+  // The `validateProjectPermission` middleware has already confirmed the user is an ADMIN of this project.
   const { projectId } = req.params;
   const { content } = req.body;
-  const project = await Project.findById(projectId);
-  if (!project) {
-    throw new ApiError(404, "project not found");
-  }
   const note = await ProjectNote.create({
-    project: mongoose.Types.ObjectId(projectId),
+    project: projectId,
     content,
-    createdBy: mongoose.Types.ObjectId(req.user._id),
+    createdBy: req.user._id,
   });
 
   const populatedNote = await ProjectNote.findById(note._id).populate(
@@ -57,31 +54,45 @@ const createNote = asyncHandler(async (req, res) => {
 });
 
 const updateNote = asyncHandler(async (req, res) => {
-  const { noteId } = req.params;
+  const { projectId, noteId } = req.params;
   const { content } = req.body;
-  const existingNote = await ProjectNote.findById(noteId);
-  if (!existingNote) {
-    throw new ApiError(404, "note not found");
+
+  if (!content) {
+    throw new ApiError(400, "Content is required for an update.");
   }
-  const updatedNote = await ProjectNote.findByIdAndUpdate(
-    noteId,
-    { content },
+
+  // Find and update the note in one atomic operation,
+  // ensuring it belongs to the correct project.
+  const updatedNote = await ProjectNote.findOneAndUpdate(
+    { _id: noteId, project: projectId },
+    { $set: { content } },
     { new: true },
   ).populate("createdBy", "username fullname avatar");
+
+  if (!updatedNote) {
+    throw new ApiError(404, "Note not found in this project");
+  }
+
   return res
     .status(200)
     .json(new ApiResponse(200, updatedNote, "note updated successfully"));
 });
 
 const deleteNotes = asyncHandler(async (req, res) => {
-  const { noteId } = req.params;
-  const existingNote = await ProjectNote.findByIdAndDelete(noteId);
-  if (!existingNote) {
-    throw new ApiError(404, "note not found");
+  const { projectId, noteId } = req.params;
+
+  // Find and delete the note, ensuring it belongs to the correct project.
+  const deletedNote = await ProjectNote.findOneAndDelete({
+    _id: noteId,
+    project: projectId,
+  });
+
+  if (!deletedNote) {
+    throw new ApiError(404, "Note not found in this project");
   }
   return res
     .status(200)
-    .json(new ApiResponse(200, existingNote, "note deleted successfully"));
+    .json(new ApiResponse(200, { _id: noteId }, "note deleted successfully"));
 });
 
 export { getNotes, getNoteById, createNote, updateNote, deleteNotes };
