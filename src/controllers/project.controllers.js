@@ -130,39 +130,23 @@ const updateProject = asyncHandler(async (req, res) => {
 
 const deleteProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
-
-  // The `validateProjectPermission` middleware has already confirmed the user is an ADMIN.
-  // A transaction ensures that if any of the delete operations fail,
-  // all previous operations will be rolled back. This prevents orphaned data.
   const session = await mongoose.startSession();
 
   try {
     session.startTransaction();
-
-    // To ensure data integrity, we must delete all documents that reference the project.
-    // This is known as a cascading delete.
-
-    // 2. Find all tasks in the project to delete their subtasks
     const tasks = await Task.find({ project: projectId })
       .select("_id")
       .session(session);
     const taskIds = tasks.map((task) => task._id);
-
-    // 3. Delete all subtasks associated with the tasks of the project
     if (taskIds.length > 0) {
       await SubTask.deleteMany({ task: { $in: taskIds } }, { session });
     }
-
-    // 4. Delete all tasks in the project
     await Task.deleteMany({ project: projectId }, { session });
 
-    // 5. Delete all associated project notes
     await ProjectNote.deleteMany({ project: projectId }, { session });
 
-    // 6. Delete all associated project members
     await ProjectMember.deleteMany({ project: projectId }, { session });
 
-    // 7. Finally, delete the project itself
     const deletedProject = await Project.findByIdAndDelete(projectId, {
       session,
     });
@@ -171,7 +155,6 @@ const deleteProject = asyncHandler(async (req, res) => {
       throw new ApiError(404, "Project not found");
     }
 
-    // If all operations were successful, commit the transaction
     await session.commitTransaction();
 
     return res
